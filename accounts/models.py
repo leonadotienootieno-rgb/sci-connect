@@ -22,22 +22,20 @@ class CustomUserManager(BaseUserManager):
 
 # --- CustomUser Model ---
 class CustomUser(AbstractUser):
-    username = None
-    email = models.EmailField(_('email address'), unique=True)
+    username = models.CharField(max_length=150, unique=True, blank=True, null=True)
+    email = models.EmailField(unique=True)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
     is_student = models.BooleanField(default=False)
     is_employer = models.BooleanField(default=False)
     is_mentor = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     objects = CustomUserManager()
 
     def _str_(self):
         return self.email
 
-
-# --- StudentProfile Model (CRITICAL FIXES & FEATURES INCLUDED) ---
 class StudentProfile(models.Model):
     # Status Choices for eligibility logic
     STATUS_CHOICES = (

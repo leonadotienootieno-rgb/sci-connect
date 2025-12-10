@@ -1,17 +1,70 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.db.models import Count
+from django.urls import reverse
+from django.db.models import Q
 from django.template.context_processors import request
-
 from .models import JobPost, Application
-from .forms import ApplicationForm,JobPostCreateForm
+from .forms import ApplicationForm,JobPostCreateForm, ApplicationStatusUpdateForm, JobApplicationForm
+from .models import JOB_CATEGORIES,JOB_LOCATIONS
+
+def is_student(user):
+    return user.is_authenticated and user.is_student
 
 
+@login_required
+@user_passes_test(is_student, login_url='/accounts/login/')
+def job_apply_view(request, job_id):
+    job = get_object_or_404(JobPost, pk=job_id)
+    student_profile = request.user.studentprofile  # Assuming profile exists
+
+    # 1. Check if the student has already applied
+    if Application.objects.filter(applicant=student_profile, job=job).exists():
+        messages.warning(request, f"You have already applied for the job: {job.title}.")
+        return redirect(reverse('job_detail_view', args=[job_id]))
+
+    if request.method == 'POST':
+        form = JobApplicationForm(request.POST)
+        if form.is_valid():
+            # Create the application object but don't save to DB yet
+            application = form.save(commit=False)
+
+            # Manually assign the FKs (Foreign Keys)
+            application.job = job
+            application.applicant = student_profile
+
+            # NOTE: application_date is set via auto_now_add in the model.
+            application.save()
+
+            messages.success(request, f"Successfully applied for the job: {job.title}!")
+            # Redirect to the student's dashboard to see the application tracking
+            return redirect(reverse('student_dashboard'))
+    else:
+        form = JobApplicationForm()
+
+    context = {
+        'form': form,
+        'job': job,
+    }
+    return render(request, 'job_apply.html', context)
 def job_list_view(request):
-    jobs = JobPost.objects.all().order_by('-posted_at')
+    jobs = JobPost.objects.filter(is_active=True ).order_by('-posted_at')
+    search_query = request.GET.get('q')
+    selected_category = request.GET.get('location')
+    if search_query:
+        jobs = jobs.filter(Q(title__icontains=search_query)|Q(description__icontains=search_query)|Q(requirements__icontains=search_query)
+                           |Q(employer_company_name__icontains=search_query)).distinct()
+    if selected_category and selected_category != 'all' :
+        jobs = jobs.filter(category=selected_category)
+    if location_filter and location_filter != 'all' :
+        jobs = jobs.filter(location=location_filter)
+
     context = {
         'jobs': jobs,
+        'search_query': search_query,
+        'selected_category': selected_category,
+        'location_filter': location_filter,
     }
     return render(request, 'job_list.html', context)
 
@@ -151,5 +204,72 @@ def job_detail_view(request, job_id):
 
     context = {
         'job': job
+    }
+    return render(request, 'job_detail.html', context)
+
+def is_employer(user):
+    return user.is_authenticated and user.is_employer
+
+@login_required
+@user_passes_test(is_employer)
+def application_status_update(request, application_id):
+    application = get_object_or_404(Application, pk=application_id)
+    if application.job.employer.user != request.user:
+        return render(request,'403.html', status=403)
+
+    if request.method == 'POST':
+        form = ApplicationStatusUpdateForm(request.POST, instance=application)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('employer_dashboard'))
+        else:
+            form = ApplicationStatusUpdateForm(instance=application)
+            context = {
+                'form': form,
+                'application': application,
+            }
+            return render(request, 'application_status_update.html')
+
+
+@login_required
+@user_passes_test(is_employer)
+def application_detail_view(request, application_id):
+    """
+    Allows employer to view full application details and update the status.
+    """
+    application = get_object_or_404(Application, pk=application_id)
+
+    # CRITICAL Security check: Ensure the current employer owns the job post
+    if application.job.employer.user != request.user:
+        # If the employer doesn't own the job, return Forbidden
+        return render(request, '403.html', status=403)
+
+        # We reuse the status update form logic here
+    if request.method == 'POST':
+        form = ApplicationStatusUpdateForm(request.POST, instance=application)
+        if form.is_valid():
+            form.save()
+            # Use Django's messages framework for feedback
+            from django.contrib import messages
+            messages.success(request,
+                             f"Status for {application.applicant.get_full_name}'s application updated successfully!")
+            return redirect(reverse('employer_dashboard'))
+    else:
+        form = ApplicationStatusUpdateForm(instance=application)
+
+    context = {
+        'application': application,
+        'student_profile': application.applicant,  # Direct access to the student profile
+        'form': form,
+    }
+    return render(request, 'application_detail.html', context)
+
+def job_detail_view(request, job_id):
+    """Displays the details of a single job post."""
+    # Fetches the job post or raises a 404 error if not found
+    job = get_object_or_404(JobPost, pk=job_id)
+
+    context = {
+        'job': job,
     }
     return render(request, 'job_detail.html', context)

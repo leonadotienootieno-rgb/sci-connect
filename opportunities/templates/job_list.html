@@ -4,36 +4,54 @@
 {% block content %}
 <div class="row">
     <div class="col-md-3">
-        <div class="card p-3 shadow-sm sticky-top" style="top: 20px;">
-            <h5 class="card-title">Filter Jobs</h5>
-            <hr>
-            <form method="GET" action="{% url 'job_list' %}" class="mb-4">
-                <div class="input-group mb-3">
-                    <input type="text" name="q" class="form-control" placeholder="Search keywords..."
-                           value="{{ search_query|default:'' }}">
-                    <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
-                </div>
+        <h3>Filter Jobs</h3>
 
-                <div class="mb-3">
-                    <label for="category" class="form-label fw-bold">Category</label>
-                    <select name="category" id="category" class="form-select">
-                        <option value="">All Categories</option>
+        <form method="GET" class="mb-4">
+            <input type="hidden" name="category" value="{{ selected_category|default:'' }}">
+            <input type="hidden" name="location" value="{{ location_filter|default:'' }}">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Search title or company"
+                       value="{{ search_query|default:'' }}">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
 
-                        {% for key, value in job_category_choices %}
-                            <option value="{{ key }}" {% if selected_category == key %}selected{% endif %}>{{ value }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+        <h5 class="mt-4">Category</h5>
+        <form method="GET" class="mb-4">
+            <input type="hidden" name="q" value="{{ search_query|default:'' }}">
+            <input type="hidden" name="location" value="{{ location_filter|default:'' }}">
+            <select name="category" class="form-select" onchange="this.form.submit()">
+                <option value="all">All Categories</option>
+                {% for code, name in categories %}
+                    <option value="{{ code }}" {% if selected_category == code %}selected{% endif %}>
+                        {{ name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
 
-                <div class="mb-3">
-                    <label for="location" class="form-label fw-bold">Location</label>
-                    <input type="text" name="location" id="location" class="form-control" placeholder="e.g., Nairobi" value="{{ location_filter|default:'' }}">
-                </div>
+        <h5 class="mt-4">Location</h5>
+        <form method="GET" class="mb-4">
+            <input type="hidden" name="q" value="{{ search_query|default:'' }}">
+            <input type="hidden" name="category" value="{{ selected_category|default:'' }}">
+            <select name="location" class="form-select" onchange="this.form.submit()">
+                <option value="all">All Locations</option>
+                {% for code, name in locations %}
+                    <option value="{{ code }}" {% if location_filter == code %}selected{% endif %}>
+                        {{ name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
 
-                <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                <a href="{% url 'job_list' %}" class="btn btn-outline-secondary w-100 mt-2">Clear Filters</a>
-            </form>
-        </div>
+        {% if search_query or selected_category or location_filter %}
+        <a href="{% url 'job_list_view' %}" class="btn btn-sm btn-outline-danger w-100">
+            Clear Filters
+        </a>
+        {% endif %}
+
+    </div>
+
     </div>
 
     <div class="col-md-9">

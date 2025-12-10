@@ -49,3 +49,19 @@ class Application(models.Model):
 
     def _str_(self):
         return f"Application for {self.job.title} by {self.applicant.email}"
+
+JOB_CATEGORIES = (
+    ('CS', 'Computer Science (Software, Data, AI)'),
+    # ... (rest of your categories) ...
+)
+
+JOB_LOCATIONS = (
+    ('Nairobi', 'Nairobi'),
+    ('Remote', 'Remote'),
+    # ... (rest of your locations) ...
+)
+
+class JobPost(models.Model):
+    # ... your model fields ...
+    category = models.CharField(max_length=50, choices=JOB_CATEGORIES)
+    # ...

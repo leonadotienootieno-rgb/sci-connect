@@ -22,8 +22,7 @@ class StudentSignUpForm(UserCreationForm):
 
         # * CRITICAL FIX: Explicitly list all fields, excluding 'username' *
         fields = ('first_name', 'last_name', 'email', 'password2')
-        # UserCreationForm implicitly includes 'password' and requires 'password2' for confirmation.
-        # We manually list the base fields ('email') plus our custom fields.
+
 
     def save(self, commit=True):
         # This save method needs to be robust, ensuring fields are passed correctly.
@@ -52,11 +51,8 @@ class EmployerSignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = CustomUser
 
-        # * CRITICAL FIX: Explicitly list all fields, excluding 'username' *
-        # We need email (for login), and the default password fields from UserCreationForm.
         fields = ('email', 'password2')
-        # You may need to add 'password' explicitly if your Django version requires it,
-        # but UserCreationForm usually handles the password fields implicitly if you list password2.
+
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -83,5 +79,29 @@ class StudentProfileUpdateForm(forms.ModelForm):
             'course': forms.TextInput(attrs={'class': 'form-control'}),
             'university': forms.TextInput(attrs={'class': 'form-control'}),
             'graduation_year': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 2024'}),
-            # Resume uses the default FileInput widget
         }
+
+
+class CustomUserEditForm(forms.ModelForm):
+    # Ensure these fields are explicitly defined for editing
+    first_name = forms.CharField(max_length=150, required=False)
+    last_name = forms.CharField(max_length=150, required=False)
+
+    # Note: We intentionally exclude email and password, which should have separate change views
+
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name']
+
+
+# Form for fields in the StudentProfile model
+class StudentProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = StudentProfile
+        # Expose all student-specific editable fields
+        fields = ['course', 'university', 'status', 'graduation_year']
+
+        # Add widget customization if needed, e.g., for Textarea or DateInput
+        # widgets = {
+        #     'graduation_year': forms.NumberInput(attrs={'placeholder': 'e.g., 2026'})
+        # }

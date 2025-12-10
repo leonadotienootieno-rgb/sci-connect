@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Employer Dashboard: {{ user.employerprofile.company_name }}</h2>
+    <p class="text-muted">Manage your job posts and applications.</p>
+
+    <div class="row mt-4">
+
+        <div class="col-md-5">
+            <h4>Your Job Posts</h4>
+            </div>
+
+        <div class="col-md-7">
+            <h4>Received Applications ({{ applications.count }})</h4>
+
+            {% if applications %}
+                {% for app in applications %}
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ app.job.title }}</h5>
+
+                        <p class="mb-1">
+                            *Applicant:* {{ app.applicant.email }}
+                            <span class="text-muted small">({{ app.applicant.get_full_name|default:"N/A" }})</span>
+                        </p>
+
+                        <p class="mb-2">
+                            *Current Status:* <span class="badge bg-danger">{{ app.get_status_display }}</span>
+                            <span class="text-muted small ms-3">Applied on: {{ app.applied_at|date:"M d, Y" }}</span>
+                        </p>
+
+                        <a href="{% url 'application_detail_view' application_id=app.id %}"
+                           class="btn btn-sm btn-warning mt-2">
+                            Review & Update Status
+                        </a>
+
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    You have not received any applications yet.
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

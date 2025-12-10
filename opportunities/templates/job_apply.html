@@ -1,36 +1,28 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}Apply for {{ job.title }}{% endblock %}
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <h1 class="mb-4">Apply for: {{ job.title }}</h1>
-        <p class="lead text-muted">Company: {{ job.employer.company_name }}</p>
-        
-        <div class="card p-4 shadow-sm">
-            <h4 class="mb-3">Application Confirmation</h4>
-            
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4">Apply for: {{ job.title }}</h2>
+            <h5 class="text-muted mb-4">Posted by: {{ job.employer.company_name }}</h5>
+
+            <div class="alert alert-info">
+                Your profile information (course, university, status) will be submitted along with this cover letter.
+            </div>
+
             <form method="post">
                 {% csrf_token %}
-                
-                <p>By clicking "Confirm Application," you are submitting your attached profile (Resume/CV, qualifications, etc.) that you uploaded in your Student Profile.</p>
-                
-                <div class="mb-3">
-                    <label for="{{ form.cover_letter_snippet.id_for_label }}" class="form-label">{{ form.cover_letter_snippet.label }}</label>
-                    {{ form.cover_letter_snippet }}
-                    {% for error in form.cover_letter_snippet.errors %}
-                        <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
-                </div>
-                
-                <div class="d-flex justify-content-between mt-4">
-                    <a href="{% url 'job_detail' job.id %}" class="btn btn-outline-secondary">← Cancel</a>
-                    <button type="submit" class="btn btn-success btn-lg">Confirm Application</button>
-                </div>
+
+                {{ form|crispy }}
+
+                <button type="submit" class="btn btn-primary btn-lg mt-3">Submit Application</button>
+                <a href="{% url 'job_detail_view' job_id=job.id %}" class="btn btn-outline-secondary mt-3 ms-2">
+                    Cancel
+                </a>
             </form>
         </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock %}
