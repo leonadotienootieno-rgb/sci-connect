@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Post New Job{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h1 class="mb-4">Post a New Opportunity</h1>
+            <p class="lead text-muted">Create a detailed listing to attract the best talent.</p>
+
+            <div class="card p-4 shadow-sm">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label fw-bold">Job Title</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Location</label>
+                            {{ form.location }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Description</label>
+                        {{ form.description }}
+                        <div class="form-text">Provide a comprehensive overview of the role and team.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Requirements</label>
+                        {{ form.requirements }}
+                        <div class="form-text">List essential qualifications and desired skills.</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Category/Field</label>
+                            {{ form.category }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold">Type of Opportunity</label>
+                            {{ form.job_type }}
+                            <div class="form-text">This determines applicant eligibility (Attachment/Internship).</div>
+                        </div>
+                        <div class="col-md-4 mb-3 form-check d-flex align-items-end">
+                            <div class="form-check-label p-2">
+                                {{ form.is_active }}
+                                <label class="form-check-label fw-bold" for="{{ form.is_active.id_for_label }}">Active (Visible to Students)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Post Job</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

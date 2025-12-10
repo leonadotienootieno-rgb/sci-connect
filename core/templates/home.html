@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Connect Science Talent to Opportunity in Kenya{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3 text-center">
+    <div class="container-fluid py-5">
+        <h1 class="display-5 fw-bold">Sci-Connect Kenya: Bridging the Science Skills Gap</h1>
+        <p class="col-md-8 fs-4 mx-auto">Connecting Natural & Life Science students and graduates in Kenya to internships, attachments, jobs, and mentorship.</p>
+
+        <a href="{% url 'job_list' %}" class="btn btn-cta btn-lg me-2">Browse Opportunities</a>
+        <a href="{% url 'student_signup' %}" class="btn btn-outline-secondary btn-lg">Join the Community</a>
+    </div>
+</div>
+
+<div class="row text-center">
+    <div class="col-lg-4">
+        <h2>Opportunities</h2>
+        <p>Targeted listings for labs, consultancies, and research institutions.</p>
+    </div><div class="col-lg-4">
+        <h2>Mentorship</h2>
+        <p>Direct interaction with professionals who have succeeded in the Kenyan science sector.</p>
+    </div><div class="col-lg-4">
+        <h2>Resources</h2>
+        <p>Download tailored CV templates, lab protocols, and interview guides.</p>
+    </div></div>{% endblock content %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Choose Account Type{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="mb-4">Join Sci-Connect Kenya</h1>
+    <p class="lead mb-5">Select the account type that best describes you:</p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-5 mb-4">
+            <div class="card p-4 h-100 shadow-lg">
+                <i class="bi bi-person-workspace display-4 text-primary mb-3"></i>
+                <h3 class="card-title">I am a Student / Graduate</h3>
+                <p class="card-text">Access job listings, mentorship, and career resources.</p>
+                <a href="{% url 'student_signup' %}" class="btn btn-primary mt-auto">Sign Up as Student</a>
+            </div>
+        </div>
+        
+        <div class="col-md-5 mb-4">
+            <div class="card p-4 h-100 shadow-lg">
+                <i class="bi bi-building display-4 text-success mb-3"></i>
+                <h3 class="card-title">I am an Employer / Company</h3>
+                <p class="card-text">Post job opportunities and find qualified science talent.</p>
+                <a href="{% url 'employer_signup' %}" class="btn btn-success mt-auto">Sign Up as Employer</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

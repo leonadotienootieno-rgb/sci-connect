@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Update Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="mb-4">Update Your Student Profile</h1>
+            <p class="lead text-muted">Manage your educational details and upload your latest Resume/CV.</p>
+
+            <div class="card p-4 shadow-sm">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.course.id_for_label }}">Course/Major</label>
+                        {{ form.course }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.university.id_for_label }}">University/Institution</label>
+                        {{ form.university }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.graduation_year.id_for_label }}">Expected/Actual Graduation Year</label>
+                        {{ form.graduation_year }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.status.id_for_label }}">Current Status</label>
+                        {{ form.status }}
+                        <div class="form-text">This determines your eligibility for Attachments vs. Internships/Jobs.</div>
+                    </div>
+                    
+                    <hr>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.resume.id_for_label }}">Upload Resume/CV</label>
+                        {% if profile.resume %}
+                            <p class="text-muted small">Current File: <a href="{{ profile.resume.url }}" target="_blank">{{ profile.resume.name|split:'/'|last }}</a></p>
+                            <p class="text-danger small">Uploading a new file will replace the current one.</p>
+                        {% else %}
+                            <p class="text-danger small">No resume currently uploaded. Required for applications!</p>
+                        {% endif %}
+                        {{ form.resume }}
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">Save Profile</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
